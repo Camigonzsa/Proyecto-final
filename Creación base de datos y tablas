@@ -1,0 +1,144 @@
+CREATE database IF NOT EXISTS Proyecto_final;
+USE Proyecto_final;
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Categoria`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Categoria (
+   id_Categoria INT NOT NULL primary KEY AUTO_INCREMENT,
+   Nombre VARCHAR(45) NOT NULL);
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Aliados`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS Aliados (
+  `id_Store` INT NOT NULL AUTO_INCREMENT,
+  `Nombre_store` VARCHAR(45) NULL,
+  `id_cuenta_banc` VARCHAR(45) NULL,
+  `Dirección` VARCHAR(45) NULL,
+  `Telefono` INT NULL,
+  PRIMARY KEY (`id_Store`),
+  UNIQUE INDEX `id_Store_UNIQUE` (`id_Store` ASC));
+
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Productos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Productos` (
+  `id_Producto` INT NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(45) NULL,
+  `Marca` VARCHAR(45) NULL,
+  `Precio` DECIMAL NULL,
+  `id_categoria` INT NULL,
+  `Id_store` INT NOT NULL,
+  PRIMARY KEY (`id_Producto`),
+  INDEX `fk_Productos_Categoria1_idx` (`id_categoria` ASC),
+  UNIQUE INDEX `id_Producto_UNIQUE` (`id_Producto` ASC) ,
+  UNIQUE INDEX `Id_store_UNIQUE` (`Id_store` ASC),
+  CONSTRAINT `fk_Productos_Categoria1`
+    FOREIGN KEY (`id_categoria`)
+    REFERENCES `Proyecto_final`.`Categoria` (`id_Categoria`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_store`
+    FOREIGN KEY (`Id_store`)
+    REFERENCES `Proyecto_final`.`Aliados` (`id_Store`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Matriz_pagos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Matriz_pagos` (
+  `id_pago` INT NOT NULL AUTO_INCREMENT,
+  `id_cuenta_banc` VARCHAR(45) NULL,
+  `id_VentaXProducto` INT NULL,
+  `id_store` INT NULL,
+  `Cuenta_pago` VARCHAR(45) NULL,
+  `valor_a_pagar` DECIMAL NULL,
+  `fecha_pago` DATE NULL,
+  PRIMARY KEY (`id_pago`),
+  UNIQUE INDEX `id_pago_UNIQUE` (`id_pago` ASC),
+  INDEX `id_Store_idx` (`id_store` ASC) );
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Matriz_ventas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Matriz_ventas` (
+  `id_VentaXProducto` INT NOT NULL AUTO_INCREMENT,
+  `id_producto` INT NULL,
+  `id_venta` INT NULL,
+  `Comisión` DECIMAL(2,2) NULL,
+  `Impuestos` DECIMAL NULL,
+  `valor_a_pagar` DECIMAL NULL,
+  PRIMARY KEY (`id_VentaXProducto`),
+  INDEX `fk_Matriz_ventas_Productos1_idx` (`id_producto` ASC) ,
+  UNIQUE INDEX `id_VentaXProducto_UNIQUE` (`id_VentaXProducto` ASC) ,
+  CONSTRAINT `fk_Matriz_ventas_Productos1`
+    FOREIGN KEY (`id_producto`)
+    REFERENCES `Proyecto_final`.`Productos` (`id_Producto`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION);
+
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Ventas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Ventas` (
+  `id_Ventas` INT NOT NULL AUTO_INCREMENT,
+  `Fecha_venta` DATE NULL,
+  `id_cliente` INT NULL,
+  `id_store` INT NULL,
+  PRIMARY KEY (`id_Ventas`),
+  UNIQUE INDEX `id_Ventas_UNIQUE` (`id_Ventas` ASC));
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Clientes (usuarios)`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Clientes (usuarios)` (
+  `id_Clientes` INT NOT NULL AUTO_INCREMENT,
+  `Nombre` VARCHAR(45) NULL,
+  `Apellido` VARCHAR(45) NULL,
+  `Edad` INT NULL,
+  `Dirección` VARCHAR(45) NULL,
+  `Telefono` INT NULL,
+  `E-mail` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_Clientes`),
+  UNIQUE INDEX `id_Clientes_UNIQUE` (`id_Clientes` ASC));
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Eventos`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Eventos` (
+  `id_evento` INT NOT NULL AUTO_INCREMENT,
+  `id_VentaXProductol` INT NULL,
+  `Gateway` VARCHAR(45) NULL,
+  `Update_at` DATE NULL,
+  `Status` VARCHAR(45) NULL,
+  `Error_reason` VARCHAR(45) NULL,
+  `Amount` DECIMAL NULL,
+  `Event_type` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_evento`),
+  UNIQUE INDEX `id_evento_UNIQUE` (`id_evento` ASC) ,
+  INDEX `id_VentaXProducto_idx` (`id_VentaXProductol` ASC),
+  CONSTRAINT `id_VentaXProducto`
+    FOREIGN KEY (`id_VentaXProductol`)
+    REFERENCES `Proyecto_final`.`Matriz_ventas` (`id_VentaXProducto`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Proyecto_final`.`Extracto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Proyecto_final`.`Extracto` (
+  `id_movimiento` INT NOT NULL,
+  `Numero_cuenta` VARCHAR(45) NULL,
+  `id_store` INT NULL,
+  `Bank_reference` VARCHAR(45) NULL,
+  `Valor_a_pagar` DECIMAL NULL,
+  `Saldo` DECIMAL NULL,
+  PRIMARY KEY (`id_movimiento`),
+  UNIQUE INDEX `id_movimiento_UNIQUE` (`id_movimiento` ASC) ,
+  INDEX `id_store_idx` (`id_store` ASC));
